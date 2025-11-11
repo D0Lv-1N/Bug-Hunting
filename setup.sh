@@ -501,6 +501,7 @@ main_install() {
     done <<< "$TOOLS_LIST"
 
     # Setup additional configurations
+    setup_wordlists
     setup_gau_config
     setup_gf_patterns
 
@@ -518,7 +519,7 @@ setup_gau_config() {
     if [ ! -f "$gau_config" ]; then
         log_info "Setting up gau configuration..."
         cat > "$gau_config" <<'EOF'
-threads = 25
+threads = 2
 verbose = false
 retries = 15
 subdomains = false
@@ -542,6 +543,21 @@ EOF
     fi
 }
 
+setup_wordlists() {
+    local wordlist_dir="$HOME/wordlist"
+
+    if [ ! -d "$wordlist_dir" ]; then
+        log_info "Cloning wordlists repository..."
+        if git clone https://github.com/D0Lv-1N/wordlist.git "$wordlist_dir" 2>/dev/null; then
+            log_ok "Wordlists cloned to $wordlist_dir"
+        else
+            log_warn "Failed to clone wordlists repository"
+        fi
+    else
+        log_info "Wordlists directory already exists, skipping clone"
+    fi
+}
+
 setup_gf_patterns() {
     local gf_dir="$HOME/.gf"
     local patterns_dir="$HOME/Gf-Patterns"
@@ -553,7 +569,7 @@ setup_gf_patterns() {
     if [ ! -d "$patterns_dir" ]; then
         log_info "Cloning GF patterns..."
         if git clone https://github.com/1ndianl33t/Gf-Patterns.git "$patterns_dir" 2>/dev/null; then
-            log_ok "GF patterns cloned"
+            log_ok "GF patterns cloned to $patterns_dir"
         else
             log_warn "Failed to clone GF patterns"
         fi
